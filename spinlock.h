@@ -8,8 +8,6 @@
 // can be aquired.
 
 // This structure manages a spinlock.
-// status = 1 if the spinlock is locked.
-// status = 0 if the spinlock is not locked.
 typedef struct spinlock{
 	int status;
 } spinlock;
