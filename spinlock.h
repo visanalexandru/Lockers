@@ -1,7 +1,8 @@
-#ifndef LOCKERS_SPINLOCK_H
-#define LOCKERS_SPINLOCK_H 
-
 #include "defines.h"
+
+#ifndef SPINLOCK_H
+#define SPINLOCK_H 
+
 
 // A spinlock is a type of lock that implements
 // busy waiting as a method of wating until the lock
