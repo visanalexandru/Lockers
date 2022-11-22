@@ -2,8 +2,10 @@
 
 void init_semaphore(semaphore*s, int value){
 	s->value=value;
-	// The list of threads that are waiting is empty.
-	s->thread_list = NULL;
+
+	// The list of waiting threads.
+	thread_list_init(&s->wait_list);
+
 	// initialize the spinlock of the semaphore.
 	init_spinlock(&s->lock);
 }
@@ -14,29 +16,29 @@ void wait_semaphore(semaphore*s){
 	// If there is no room for this thread, make it go to sleep
 	// and add it to the list of waiting threads.
 	if(s->value==0){
-		struct thread * this = malloc(sizeof(struct thread));		
+		thread * this = malloc(sizeof(struct thread));		
+
 		this->thread_id = gettid();
-		// Add it at the beginning of the list.
-		this->next_thread = s -> thread_list;
-		s->thread_list = this;
-		
-		// Create the signal set.
-		sigset_t set;
-		sigemptyset(&set);
+		this->next_thread = NULL;
+	
+		// Add it to the waiting list.
+		thread_list_push(&s->wait_list,this);
 
-		// We use SIGUSR1 for signals.
-		sigaddset(&set, SIGUSR1);
+		// Initialize the signal set.
+		sigset_t block_signals;
+		sigemptyset(&block_signals);
+		sigaddset(&block_signals, SIGUSR1);
 
-		// Block SIGUSR1.
-		sigprocmask(SIG_BLOCK, &set, NULL);
+		// Block the signals.
+		sigprocmask(SIG_BLOCK, &block_signals, NULL);
 
 		// We block the signal before unlocking the 
 		// spinlock to avoid a race condition.
 		unlock_spinlock(&s->lock);
 
 		// Go to sleep until we receive SIGUSR1.
-		int signal;
-		sigwait(&set,&signal);
+		int received;
+		sigwait(&block_signals,&received);
 	}
 	else{
 		s->value--;
@@ -46,14 +48,17 @@ void wait_semaphore(semaphore*s){
 
 void signal_semaphore(semaphore*s){
 	lock_spinlock(&s->lock);
-	// Chose the next thread that is waiting 
-	struct thread * waiting = s->thread_list;
-	if(waiting!=NULL){
-		s->thread_list = waiting->next_thread;
-		tgkill(waiting->thread_id,SIGUSR1);
+
+	// Chose the next thread that is waiting.
+	if(!thread_list_empty(&s->wait_list)){
+		thread * next= thread_list_pop(&s->wait_list);
+		unlock_spinlock(&s->lock);
+
+		tgkill(next->thread_id,SIGUSR1);
+		free(next);
 	}
 	else{
 		s->value++;
+		unlock_spinlock(&s->lock);
 	}
-	unlock_spinlock(&s->lock);
 }

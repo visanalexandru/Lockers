@@ -18,12 +18,30 @@ pid_t gettid();
 // There is no glibc wrapper function for the tgkill() syscall.
 int tgkill(int tid, int sig);
 
-// A list of threads. Used in the implementation of the semaphore.
-struct thread{
+// A node in the list of threads. 
+typedef struct thread{
 	int thread_id;
 	struct thread*next_thread;
-};
+} thread;
 
+// A list of threads.
+typedef struct thread_list{
+	struct thread * head;
+	struct thread * tail;
+} thread_list;
+
+// Initializes an empty list of threads.
+void thread_list_init(thread_list*l);
+
+// Add a new thread to a list.
+void thread_list_push(thread_list*l, thread* t);
+
+// Returns the first thread in the list and removes it.
+// This function does not check if the list is empty.
+thread* thread_list_pop(thread_list*l);
+
+// Returns 1 if the list is empty, otherwise 0.
+int thread_list_empty(thread_list*l);
 
 // The spinlock status.
 #define LOCKED 1 

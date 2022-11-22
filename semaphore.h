@@ -14,7 +14,7 @@
 // lock - a spinlock used to make wait() and signal() atomic.
 typedef struct semaphore{
 	int value;
-	struct thread* thread_list;
+	thread_list wait_list;
 	spinlock lock;
 } semaphore;
 
