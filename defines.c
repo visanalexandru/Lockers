@@ -14,13 +14,15 @@ void thread_list_init(thread_list*l){
 }
 
 void thread_list_destroy(thread_list*l){
+	thread * current = l->head;
 	thread * next;
-	while(l->head!=NULL){
-		next=l->head->next_thread;
-		free(l->head);
-		l->head=next;
+	while(current != NULL){
+		next=current->next_thread;
+		free(current);
+		current=next;
 	}
-	l->tail=l->head;
+	l->head=NULL;
+	l->tail=NULL;
 }
 
 void thread_list_push(thread_list*l, thread* t){
