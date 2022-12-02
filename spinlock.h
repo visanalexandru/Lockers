@@ -17,6 +17,10 @@ typedef struct spinlock{
 // Initializes the spinlock.
 void init_spinlock(spinlock*lock);
 
+// Destroys the spinlock.
+void destroy_spinlock(spinlock*lock);
+
+
 // Try to aquire the spinlock. If the spinlock
 // is locked, wait until it gets unlocked.
 void lock_spinlock(spinlock*lock);

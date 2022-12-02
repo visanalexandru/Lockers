@@ -10,10 +10,17 @@ void init_semaphore(semaphore*s, int value){
 	init_spinlock(&s->lock);
 }
 
+// Free the memory used by the semaphore.
+void destroy_semaphore(semaphore*s){
+	s->value = 0;
+	thread_list_destroy(&s->wait_list);
+	destroy_spinlock(&s->lock);
+}
+
 void wait_semaphore(semaphore*s){
 	lock_spinlock(&s->lock);
 
-	// If there is no room for this thread, make it go to sleep
+	// If the value is 0, make the thread go to sleep
 	// and add it to the list of waiting threads.
 	if(s->value==0){
 		thread * this = malloc(sizeof(struct thread));		

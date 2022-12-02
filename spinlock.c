@@ -12,6 +12,7 @@ void init_spinlock(spinlock*l){
 // lock to 1 meaning "locked". If the value of the lock was 1,
 // we must loop again, else the lock is now locked and we exit 
 // the loop.
+// CAS also ensures memory barrier. 
 void lock_spinlock(spinlock*l){
 	while(COMPARE_AND_SWAP(&l->status,UNLOCKED,LOCKED) == LOCKED);
 }
@@ -22,5 +23,11 @@ void lock_spinlock(spinlock*l){
 // a thread that unlocks the lock while not owning it.
 // This behaviour is undefined.
 void unlock_spinlock(spinlock*l){
+	l->status=UNLOCKED;
+}
+
+
+// Implement if we ever need to free some resources.
+void destroy_spinlock(spinlock*l){
 	l->status=UNLOCKED;
 }

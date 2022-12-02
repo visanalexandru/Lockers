@@ -26,12 +26,15 @@ typedef struct thread{
 
 // A list of threads.
 typedef struct thread_list{
-	struct thread * head;
-	struct thread * tail;
+	thread * head;
+	thread * tail;
 } thread_list;
 
 // Initializes an empty list of threads.
 void thread_list_init(thread_list*l);
+
+// Frees the memory used by the list.
+void thread_list_destroy(thread_list*l);
 
 // Add a new thread to a list.
 void thread_list_push(thread_list*l, thread* t);

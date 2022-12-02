@@ -13,6 +13,16 @@ void thread_list_init(thread_list*l){
 	l->tail=NULL;
 }
 
+void thread_list_destroy(thread_list*l){
+	thread * next;
+	while(l->head!=NULL){
+		next=l->head->next_thread;
+		free(l->head);
+		l->head=next;
+	}
+	l->tail=l->head;
+}
+
 void thread_list_push(thread_list*l, thread* t){
 	// Check if the list is empty.
 	if(l->head == NULL){
